@@ -1,4 +1,5 @@
 #include "scene.h"
+#include "light.h"
 
 Scene::Scene(std::string sceneDirectory, std::string sceneJson)
 {
@@ -69,6 +70,12 @@ void Scene::parse(std::string sceneDirectory, nlohmann::json sceneConfig)
         std::cerr << "No camera(s) defined. Atleast one camera should be defined." << std::endl;
         exit(1);
     }
+
+    // Lights
+    std::cout << "Here::> " << __LINE__ << std::endl;
+
+    this->lights = loadLights(sceneConfig);
+    std::cout << "Here::> " << __LINE__ << std::endl;
 
     // Surface
     try {

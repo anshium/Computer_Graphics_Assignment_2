@@ -46,6 +46,8 @@ add_executable(render
 	camera.cpp
 	surface.cpp
 	texture.cpp
+	light.cpp
+	shade.cpp
 
 	# DEPS
   	extern/tinyexr/deps/miniz/miniz.c

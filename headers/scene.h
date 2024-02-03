@@ -2,6 +2,7 @@
 
 #include "camera.h"
 #include "surface.h"
+#include "light.h"
 
 struct Scene {
     std::vector<Surface> surfaces;
@@ -12,6 +13,8 @@ struct Scene {
     AABB bbox;
     BVHNode* nodes;
     int numBVHNodes = 0;
+
+    std::vector<Light> lights;
 
     Scene() {};
     Scene(std::string sceneDirectory, std::string sceneJson);
