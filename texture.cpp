@@ -275,7 +275,7 @@ Vector2f Texture::getUVCoordinates(Vector3f intersection_point, Vector3f v1, Vec
 
 // I am guessing the 
 // Fetches the color of the पास का पडोसी |
-Vector3f Texture::nearestNeighbourFetch(float u, float v){
+Vector3f Texture::nearestNeighbourFetch(float u, float v, int x, int y){
     Vector3f color = {1, 1, 1};
 
     // Assuming that u and v both lie from 0 to 1
@@ -322,8 +322,22 @@ Vector3f Texture::nearestNeighbourFetch(float u, float v){
         pass_wala_padosi = bottomCornerRight;
         min_distance = (middle_vector - bottomCornerRight).Length();
     }
+    
 
     color = this->loadPixelColor(pass_wala_padosi.x, pass_wala_padosi.y);
+    if(x == 545 && y == 594){
+        for(int i = 0; i < this->resolution.x; i++){
+            for(int j = 0; j < this->resolution.y; j++){
+                color = this->loadPixelColor(i, j);
+                if(color.x != 0 || color.y != 0 || color.z != 0){
+                    std::cout << "Color: " << color.x << ", " << color.y << ", " << color.z << std::endl;
+                }
+            }
+        }
+        std::cout << "PWP: " << pass_wala_padosi.x << ", " << pass_wala_padosi.y << std::endl;
+        std::cout << "Resolution: " << this->resolution.x << ", " << this->resolution.y << std::endl;
+        std::cout << "Color: " << color.x << ", " << color.y << ", " << color.z << std::endl;
+    }
 
     return color;
 }

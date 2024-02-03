@@ -27,10 +27,19 @@ long long Integrator::render()
                 Vector2f uv = this->outputImage.getUVCoordinates(
                     si.p, 
                     si.triangleIntersected.v1, si.triangleIntersected.v2, si.triangleIntersected.v3, 
-                    si.triangleIntersected.uv1, si.triangleIntersected.uv2, si.triangleIntersected.uv2
+                    si.triangleIntersected.uv1, si.triangleIntersected.uv2, si.triangleIntersected.uv3
                 );
-                white_color = this->outputImage.nearestNeighbourFetch(uv.x, uv.y);
 
+                white_color = this->outputImage.nearestNeighbourFetch(uv.x, uv.y, x, y);
+                // if(uv.x != 0 || uv.y != 0){
+
+                //     std::cout << uv.x << ", " << uv.y << std::endl;
+                //     std::cout << "x, y: " << x << ", " << y << std::endl;
+                // }
+                if(x == 545 && y == 594){
+                    std::cout << uv.x << ", " << uv.y << std::endl;
+                    std::cout << white_color.x << ", " << white_color.y << ", " << white_color.z << std::endl;
+                }
 
                 for(auto& light : this->scene.lights){
                     if(light.lightType == DIRECTIONAL_LIGHT){

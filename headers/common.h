@@ -55,9 +55,12 @@ struct Tri {
     AABB bbox;
 };
 
+struct Surface;
+
 struct Interaction {
     Vector3f p, n;
     Tri triangleIntersected; // Let's see if this works
+    Surface* intersected_on_surface; // Pointer to which surface it intersected on
     float t = 1e30f;
     bool didIntersect = false;
 };

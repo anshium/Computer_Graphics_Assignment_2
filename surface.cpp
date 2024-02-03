@@ -263,6 +263,7 @@ Interaction Surface::rayTriangleIntersect(Ray ray, Vector3f v1, Vector3f v2, Vec
                     }
                     break;
             }
+            si.intersected_on_surface = this;
         }
         else {
             si.didIntersect = false;
