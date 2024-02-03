@@ -3,15 +3,6 @@
 #include "common.h"
 #include "texture.h"
 
-struct Tri {
-    Vector3f v1, v2, v3;
-    Vector2f uv1, uv2, uv3;
-    Vector3f normal;
-    Vector3f centroid;
-    
-    AABB bbox;
-};
-
 struct Surface {
     std::vector<Vector3f> vertices, normals;
     std::vector<Vector3i> indices;

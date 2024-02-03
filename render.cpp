@@ -18,9 +18,32 @@ long long Integrator::render()
             Ray cameraRay = this->scene.camera.generateRay(x, y);
             Interaction si = this->scene.rayIntersect(cameraRay);
 
-            // Might be too dumb to do and even this might not work with some fairly complex scenes
-            // Iterate through all the triangles and see which triangle has its vertices closest to to the intersection point and on the plane and the normal = sum of normals of the vertices / 3 normalised
-            
+            // Not doing this:    // Might be too dumb to do and even this might not work with some fairly complex scenes
+            // Not doing this:    // Iterate through all the triangles and see which triangle has its vertices closest to to the intersection point and on the plane and the normal = sum of normals of the vertices / 3 normalised
+
+            Vector2f uv1;
+            Vector2f uv2;
+            Vector2f uv3;
+
+            // This is buggy. I can imagine a case when two shapes overlap and we don;t know which one to color. Many cases in fact.
+            for(auto& surface : this->scene.surfaces){
+                for(auto& triangle : surface.tris){
+                    if(
+                        triangle.v1 == si.triangleIntersected.v1 &&
+                        triangle.v2 == si.triangleIntersected.v2 &&
+                        triangle.v3 == si.triangleIntersected.v3
+                    ){
+                        uv1 = triangle.uv1;
+                        uv2 = triangle.uv2;
+                        uv3 = triangle.uv3;
+                        break;
+                    }
+                }
+            }
+
+            Vector2f uv = this->outputImage.getUVCoordinates(si.p, si.triangleIntersected.v1, si.triangleIntersected.v2, si.triangleIntersected.v3, uv1, uv2, uv2);
+
+            white_color = this->outputImage.nearestNeighbourFetch(uv.x, uv.y);
 
             if(si.didIntersect){
                 for(auto& light : this->scene.lights){

@@ -30,5 +30,6 @@ struct Texture {
     void savePng(std::string path);
 
     Vector3f nearestNeighbourFetch(float u, float v);
-    Vector2f getUVCoordinates(Vector3f intersection_point);
+    Vector2f getUVCoordinates(Vector3f intersection_point, Vector3f v1, Vector3f v2, Vector3f v3, Vector2f u1, Vector2f u2, Vector2f u3);
+    // Vector3f getColor(int option);
 };

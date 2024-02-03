@@ -245,6 +245,9 @@ Interaction Surface::rayTriangleIntersect(Ray ray, Vector3f v1, Vector3f v2, Vec
         if (edge1 && edge2 && edge3) {
             // Intersected triangle!
             si.didIntersect = true;
+            si.triangleIntersected.v1 = v1;
+            si.triangleIntersected.v2 = v2;
+            si.triangleIntersected.v3 = v3;
         }
         else {
             si.didIntersect = false;
@@ -360,7 +363,7 @@ void Surface::intersectBVH(uint32_t nodeIdx, Ray& ray, Interaction& si)
                 this->tris[this->getIdx(i + node.firstPrim)].normal
             );
             if (siIntermediate.t <= ray.t && siIntermediate.didIntersect) {
-                
+
                 si = siIntermediate;
                 ray.t = si.t;
             }

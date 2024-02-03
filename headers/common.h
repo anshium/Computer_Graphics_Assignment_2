@@ -23,12 +23,6 @@ struct Ray {
         : o(origin), d(direction), t(t), tmax(tmax) {};
 };
 
-struct Interaction {
-    Vector3f p, n;
-    float t = 1e30f;
-    bool didIntersect = false;
-};
-
 struct AABB {
     Vector3f min = Vector3f(1e30f, 1e30f, 1e30f);
     Vector3f max = Vector3f(-1e30f, -1e30f, -1e30f);
@@ -50,4 +44,20 @@ struct BVHNode {
     AABB bbox;
     uint32_t left = 0, right = 0;
     uint32_t firstPrim = 0, primCount = 0;
+};
+
+struct Tri {
+    Vector3f v1, v2, v3;
+    Vector2f uv1, uv2, uv3;
+    Vector3f normal;
+    Vector3f centroid;
+    
+    AABB bbox;
+};
+
+struct Interaction {
+    Vector3f p, n;
+    Tri triangleIntersected; // Let's see if this works
+    float t = 1e30f;
+    bool didIntersect = false;
 };

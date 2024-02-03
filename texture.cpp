@@ -208,10 +208,24 @@ void Texture::savePng(std::string path)
     }
 }
 
+double computeArea(Vector3f v1, Vector3f v2, Vector3f v3){
+    double s = (v1.Length() + v2.Length() + v3.Length()) / 3;
+
+    double area = std::sqrt(s * (s - v1.Length()) * (s-v2.Length()) * (s-v3.Length()));
+
+    return area;
+}
+
 // Get UV Coordinates at intersection point using barycentric coordinates
-Vector2f Texture::getUVCoordinates(Vector3f intersection_point){
-    // calculate subareas
-    // this->
+Vector2f Texture::getUVCoordinates(Vector3f intersection_point, Vector3f v1, Vector3f v2, Vector3f v3, Vector2f u1, Vector2f u2, Vector2f u3){
+    double main_triangle_area = computeArea(v1, v2, v3);
+    double alpha    = computeArea(intersection_point, v2, v3) / main_triangle_area;
+    double beta     = computeArea(v1, intersection_point, v3) / main_triangle_area;
+    double gamma    = computeArea(v1, v2, intersection_point) / main_triangle_area;
+
+    Vector2f uv = alpha * u1 + beta * u2 + gamma * u3;
+
+    return uv;
 }
 
 // I am guessing the 
