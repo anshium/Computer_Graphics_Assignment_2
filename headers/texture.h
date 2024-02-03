@@ -28,4 +28,7 @@ struct Texture {
     void save(std::string path);
     void saveExr(std::string path);
     void savePng(std::string path);
+
+    Vector3f nearestNeighbourFetch(float u, float v);
+    Vector2f getUVCoordinates(Vector3f intersection_point);
 };

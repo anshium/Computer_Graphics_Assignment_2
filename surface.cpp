@@ -360,6 +360,7 @@ void Surface::intersectBVH(uint32_t nodeIdx, Ray& ray, Interaction& si)
                 this->tris[this->getIdx(i + node.firstPrim)].normal
             );
             if (siIntermediate.t <= ray.t && siIntermediate.didIntersect) {
+                
                 si = siIntermediate;
                 ray.t = si.t;
             }

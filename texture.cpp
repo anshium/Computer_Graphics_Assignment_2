@@ -207,3 +207,63 @@ void Texture::savePng(std::string path)
         std::cerr << "Cannot save to PNG: texture is not of type uint32." << std::endl;
     }
 }
+
+// Get UV Coordinates at intersection point using barycentric coordinates
+Vector2f Texture::getUVCoordinates(Vector3f intersection_point){
+    // calculate subareas
+    // this->
+}
+
+// I am guessing the 
+// Fetches the color of the पास का पडोसी |
+Vector3f Texture::nearestNeighbourFetch(float u, float v){
+    Vector3f color = {1, 1, 1};
+
+    // Assuming that u and v both lie from 0 to 1
+    // Let's check that:
+    if(!(u >= 0 && u <= 1 && v >=0 && v <= 1)){
+        std::cout << "Error in UV Bounds" << std::endl;
+    }
+
+    // convert the u, v coordinates to texel coordinates
+    float tx = u;
+    float ty = 1 - v;
+
+    // find corners
+    Vector2f topCornerLeft;
+    topCornerLeft.x = floor(tx * this->resolution.x);
+    topCornerLeft.y = floor(ty * this->resolution.y);
+
+    Vector2f topCornerRight;
+    topCornerRight = {topCornerLeft.x + 1, topCornerLeft.y};
+
+    Vector2f bottomCornerLeft = {topCornerLeft.x, topCornerLeft.y + 1};
+    Vector2f bottomCornerRight = {topCornerLeft.x + 1, topCornerLeft.y + 1};
+
+    Vector2f middle_vector = {tx * this->resolution.x, tx * this->resolution.y};
+
+    Vector2f pass_wala_padosi;
+
+    float min_distance = 1e30;
+
+    if((middle_vector - topCornerLeft).Length() < min_distance){
+        pass_wala_padosi = topCornerLeft;
+        min_distance = (middle_vector - topCornerLeft).Length();
+    }
+    if((middle_vector - topCornerRight).Length() < min_distance){
+        pass_wala_padosi = topCornerRight;
+        min_distance = (middle_vector - topCornerRight).Length();
+    }
+    if((middle_vector - bottomCornerLeft).Length() < min_distance){
+        pass_wala_padosi = bottomCornerLeft;
+        min_distance = (middle_vector - bottomCornerLeft).Length();
+    }
+    if((middle_vector - bottomCornerRight).Length() < min_distance){
+        pass_wala_padosi = bottomCornerRight;
+        min_distance = (middle_vector - bottomCornerRight).Length();
+    }
+
+    color = this->loadPixelColor(pass_wala_padosi.x, pass_wala_padosi.y);
+
+    return color;
+}

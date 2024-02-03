@@ -18,6 +18,10 @@ long long Integrator::render()
             Ray cameraRay = this->scene.camera.generateRay(x, y);
             Interaction si = this->scene.rayIntersect(cameraRay);
 
+            // Might be too dumb to do and even this might not work with some fairly complex scenes
+            // Iterate through all the triangles and see which triangle has its vertices closest to to the intersection point and on the plane and the normal = sum of normals of the vertices / 3 normalised
+            
+
             if(si.didIntersect){
                 for(auto& light : this->scene.lights){
                     if(light.lightType == DIRECTIONAL_LIGHT){
@@ -42,9 +46,6 @@ long long Integrator::render()
                         if(shadowRayInteraction.didIntersect && Dot(shadowRayInteraction.p - si.p, shadowRayInteraction.p - si.p) > Dot(displacementVector, displacementVector)){
                             color += shade(light, white_color) * AbsDot(direction, si.n) / Dot(displacementVector, displacementVector);
                         }
-                    }
-                    else{
-                        std::cout << "Hello" << std::endl;  
                     }
                 }
                 this->outputImage.writePixelColor(color, x, y);
