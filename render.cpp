@@ -21,31 +21,17 @@ long long Integrator::render()
             // Not doing this:    // Might be too dumb to do and even this might not work with some fairly complex scenes
             // Not doing this:    // Iterate through all the triangles and see which triangle has its vertices closest to to the intersection point and on the plane and the normal = sum of normals of the vertices / 3 normalised
 
-            Vector2f uv1;
-            Vector2f uv2;
-            Vector2f uv3;
-
-            // This is buggy. I can imagine a case when two shapes overlap and we don;t know which one to color. Many cases in fact.
-            for(auto& surface : this->scene.surfaces){
-                for(auto& triangle : surface.tris){
-                    if(
-                        triangle.v1 == si.triangleIntersected.v1 &&
-                        triangle.v2 == si.triangleIntersected.v2 &&
-                        triangle.v3 == si.triangleIntersected.v3
-                    ){
-                        uv1 = triangle.uv1;
-                        uv2 = triangle.uv2;
-                        uv3 = triangle.uv3;
-                        break;
-                    }
-                }
-            }
-
-            Vector2f uv = this->outputImage.getUVCoordinates(si.p, si.triangleIntersected.v1, si.triangleIntersected.v2, si.triangleIntersected.v3, uv1, uv2, uv2);
-
-            white_color = this->outputImage.nearestNeighbourFetch(uv.x, uv.y);
 
             if(si.didIntersect){
+
+                Vector2f uv = this->outputImage.getUVCoordinates(
+                    si.p, 
+                    si.triangleIntersected.v1, si.triangleIntersected.v2, si.triangleIntersected.v3, 
+                    si.triangleIntersected.uv1, si.triangleIntersected.uv2, si.triangleIntersected.uv2
+                );
+                white_color = this->outputImage.nearestNeighbourFetch(uv.x, uv.y);
+
+
                 for(auto& light : this->scene.lights){
                     if(light.lightType == DIRECTIONAL_LIGHT){
                         // Now we will see if the ray intersected in the direction of the light from the point where it intersected with the scene from the viewport

@@ -264,3 +264,8 @@ template <typename T>
 Vector2<T> Abs(const Vector2<T>& v) {
     return Vector2<T>(std::abs(v.x), std::abs(v.y));
 }
+
+template <typename T>
+constexpr const T& clamp(const T& value, const T& min, const T& max) {
+    return (value < min) ? min : (value > max) ? max : value;
+}

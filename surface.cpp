@@ -248,6 +248,21 @@ Interaction Surface::rayTriangleIntersect(Ray ray, Vector3f v1, Vector3f v2, Vec
             si.triangleIntersected.v1 = v1;
             si.triangleIntersected.v2 = v2;
             si.triangleIntersected.v3 = v3;
+
+            // This is buggy. I can imagine a case when two shapes overlap and we don;t know which one to color. Many cases in fact.
+
+            for(Tri triangle : this->tris){
+                if(
+                    triangle.v1 == v1 &&
+                    triangle.v2 == v2 &&
+                    triangle.v3 == v3 
+                    ){
+                        si.triangleIntersected.uv1 = triangle.uv1;
+                        si.triangleIntersected.uv2 = triangle.uv2;
+                        si.triangleIntersected.uv3 = triangle.uv3;
+                    }
+                    break;
+            }
         }
         else {
             si.didIntersect = false;

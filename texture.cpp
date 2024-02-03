@@ -8,6 +8,8 @@
 #define TINYEXR_IMPLEMENTATION
 #include "tinyexr/tinyexr.h"
 
+#define EPSILON 0.001
+
 Texture::Texture(std::string pathToImage)
 {
     size_t pos = pathToImage.find(".exr");
@@ -209,9 +211,13 @@ void Texture::savePng(std::string path)
 }
 
 double computeArea(Vector3f v1, Vector3f v2, Vector3f v3){
-    double s = (v1.Length() + v2.Length() + v3.Length()) / 3;
+    Vector3f side1 = (v2 - v3);
+    Vector3f side2 = (v3 - v1);
+    Vector3f side3 = (v1 - v2);
+    
+    double s = (side1.Length() + side2.Length() + side3.Length()) / 2;
 
-    double area = std::sqrt(s * (s - v1.Length()) * (s-v2.Length()) * (s-v3.Length()));
+    double area = std::sqrt(s * (s - side1.Length()) * (s - side2.Length()) * (s - side3.Length()));
 
     return area;
 }
@@ -219,11 +225,50 @@ double computeArea(Vector3f v1, Vector3f v2, Vector3f v3){
 // Get UV Coordinates at intersection point using barycentric coordinates
 Vector2f Texture::getUVCoordinates(Vector3f intersection_point, Vector3f v1, Vector3f v2, Vector3f v3, Vector2f u1, Vector2f u2, Vector2f u3){
     double main_triangle_area = computeArea(v1, v2, v3);
+    if(main_triangle_area <= 0){
+        std::cout << "SQRT of Negative quantity" << std::endl;
+    }
     double alpha    = computeArea(intersection_point, v2, v3) / main_triangle_area;
     double beta     = computeArea(v1, intersection_point, v3) / main_triangle_area;
     double gamma    = computeArea(v1, v2, intersection_point) / main_triangle_area;
 
+    if(std::isnan(alpha)){
+        alpha = 0;
+    }
+    if(std::isnan(beta)){
+        beta = 0;
+    }
+    if(std::isnan(gamma)){
+        gamma = 0;
+    }
+
+    // Assuming u1, u2, u3 are defined and you want to print their values as well
+    #ifdef DEBUG 
+    std::cout << "IP: " << "x: " << intersection_point.x << ", y: " << intersection_point.y << ", z: " << intersection_point.z << std::endl; 
+
+
+    std::cout << "v1: " << "x: " << v1.x << ", y: " << v1.y << ", z: " << v1.z << std::endl; 
+    std::cout << "v2: " << "x: " << v2.x << ", y: " << v2.y << ", z: " << v2.z << std::endl;
+    std::cout << "v3: " << "x: " << v3.x << ", y: " << v3.y << ", z: " << v3.z << std::endl;
+    // Assuming u1, u2, u3 are defined and you want to print their values as well
+    std::cout << "v1: " << "Length: " << (v1 - v2).Length() << std::endl;
+    std::cout << "v2: " << "Length: " << (v2 - v3).Length() << std::endl;
+    std::cout << "v3: " << "Length: " << (v3 - v1).Length() << std::endl;
+    // Printing the values
+    std::cout << "Main Triangle Area: " << main_triangle_area << std::endl;
+    std::cout << "Alpha: " << alpha << std::endl;
+    std::cout << "Beta: " << beta << std::endl;
+    std::cout << "Gamma: " << gamma << std::endl;
+
+    // Assuming u1, u2, u3 are defined and you want to print their values as well
+    std::cout << "u1: " << "x: " << u1.x << ", y: " << u1.y << std::endl;
+    std::cout << "u2: " << "x: " << u2.x << ", y: " << u2.y << std::endl;
+    std::cout << "u3: " << "x: " << u3.x << ", y: " << u3.y << std::endl;
+    #endif
     Vector2f uv = alpha * u1 + beta * u2 + gamma * u3;
+
+    uv.x = clamp(uv.x, 0.0f, 1.0f);
+    uv.y = clamp(uv.y, 0.0f, 1.0f);
 
     return uv;
 }
@@ -237,6 +282,7 @@ Vector3f Texture::nearestNeighbourFetch(float u, float v){
     // Let's check that:
     if(!(u >= 0 && u <= 1 && v >=0 && v <= 1)){
         std::cout << "Error in UV Bounds" << std::endl;
+        exit(1);
     }
 
     // convert the u, v coordinates to texel coordinates
