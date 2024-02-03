@@ -40,7 +40,6 @@ std::vector<Light> loadLights(nlohmann::json sceneConfig){
 
         lightVector.push_back(light);
 
-        light_index += 1;
     }
 
     // std::cout << "Here " << __LINE__ << std::endl;
@@ -48,7 +47,7 @@ std::vector<Light> loadLights(nlohmann::json sceneConfig){
     auto pointLights = sceneConfig["pointLights"];
 
     for(auto& pointLight : pointLights){
-        auto& location = pointLight["direction"];
+        auto& location = pointLight["location"];
         auto& radiance = pointLight["radiance"];
 
         Vector3f locationVector;
@@ -69,7 +68,6 @@ std::vector<Light> loadLights(nlohmann::json sceneConfig){
         );
     // std::cout << "Here " << __LINE__ << std::endl;
         lightVector.push_back(light);
-        light_index += 1;
     // std::cout << "Here " << __LINE__ << std::endl;
     }
 

@@ -29,6 +29,23 @@ long long Integrator::render()
                             color += shade(light, white_color) * AbsDot(light.locationOrDirection, si.n);
                         }
                     }
+                    else if(light.lightType == POINT_LIGHT){
+                        Vector3f displacementVector = light.locationOrDirection - si.p;
+                        Vector3f direction = Normalize(displacementVector);
+
+                        Ray shadowRay = Ray(si.p + 0.01 * si.n, direction);
+                        Interaction shadowRayInteraction = this->scene.rayIntersect(shadowRay);
+                        
+                        if(!shadowRayInteraction.didIntersect){
+                            color += shade(light, white_color) * AbsDot(direction, si.n) / Dot(displacementVector, displacementVector);
+                        }
+                        if(shadowRayInteraction.didIntersect && Dot(shadowRayInteraction.p - si.p, shadowRayInteraction.p - si.p) > Dot(displacementVector, displacementVector)){
+                            color += shade(light, white_color) * AbsDot(direction, si.n) / Dot(displacementVector, displacementVector);
+                        }
+                    }
+                    else{
+                        std::cout << "Hello" << std::endl;  
+                    }
                 }
                 this->outputImage.writePixelColor(color, x, y);
             }
