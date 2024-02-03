@@ -26,12 +26,13 @@ long long Integrator::render()
                         Interaction shadowRayInteraction = this->scene.rayIntersect(shadowRay);
 
                         if(!shadowRayInteraction.didIntersect){
-                            color += shade(light, white_color);
+                            color += shade(light, white_color) * AbsDot(light.locationOrDirection, si.n);
                         }
                     }
                 }
                 this->outputImage.writePixelColor(color, x, y);
             }
+            this->outputImage.writePixelColor(color, x, y);
         }
     }
     auto finishTime = std::chrono::high_resolution_clock::now();
