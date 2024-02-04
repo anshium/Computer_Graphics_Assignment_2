@@ -33,7 +33,7 @@ struct Surface {
     Interaction rayTriangleIntersect(Ray ray, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f n);
     Interaction rayIntersect(Ray& ray);
 
-private:
+// private:     // WHy was this private? I need to see
     bool hasDiffuseTexture();
     bool hasAlphaTexture();
 };

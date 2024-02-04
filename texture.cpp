@@ -275,7 +275,7 @@ Vector2f Texture::getUVCoordinates(Vector3f intersection_point, Vector3f v1, Vec
 
 // I am guessing the 
 // Fetches the color of the पास का पडोसी |
-Vector3f Texture::nearestNeighbourFetch(float u, float v, int x, int y){
+Vector3f nearestNeighbourFetch(Texture texture, float u, float v, int x, int y){
     Vector3f color = {1, 1, 1};
 
     // Assuming that u and v both lie from 0 to 1
@@ -291,8 +291,8 @@ Vector3f Texture::nearestNeighbourFetch(float u, float v, int x, int y){
 
     // find corners
     Vector2f topCornerLeft;
-    topCornerLeft.x = floor(tx * this->resolution.x);
-    topCornerLeft.y = floor(ty * this->resolution.y);
+    topCornerLeft.x = floor(tx * texture.resolution.x);
+    topCornerLeft.y = floor(ty * texture.resolution.y);
 
     Vector2f topCornerRight;
     topCornerRight = {topCornerLeft.x + 1, topCornerLeft.y};
@@ -300,7 +300,7 @@ Vector3f Texture::nearestNeighbourFetch(float u, float v, int x, int y){
     Vector2f bottomCornerLeft = {topCornerLeft.x, topCornerLeft.y + 1};
     Vector2f bottomCornerRight = {topCornerLeft.x + 1, topCornerLeft.y + 1};
 
-    Vector2f middle_vector = {tx * this->resolution.x, tx * this->resolution.y};
+    Vector2f middle_vector = {tx * texture.resolution.x, tx * texture.resolution.y};
 
     Vector2f pass_wala_padosi;
 
@@ -324,20 +324,26 @@ Vector3f Texture::nearestNeighbourFetch(float u, float v, int x, int y){
     }
     
 
-    color = this->loadPixelColor(pass_wala_padosi.x, pass_wala_padosi.y);
-    if(x == 545 && y == 594){
-        for(int i = 0; i < this->resolution.x; i++){
-            for(int j = 0; j < this->resolution.y; j++){
-                color = this->loadPixelColor(i, j);
-                if(color.x != 0 || color.y != 0 || color.z != 0){
-                    std::cout << "Color: " << color.x << ", " << color.y << ", " << color.z << std::endl;
-                }
-            }
-        }
-        std::cout << "PWP: " << pass_wala_padosi.x << ", " << pass_wala_padosi.y << std::endl;
-        std::cout << "Resolution: " << this->resolution.x << ", " << this->resolution.y << std::endl;
-        std::cout << "Color: " << color.x << ", " << color.y << ", " << color.z << std::endl;
-    }
+    color = texture.loadPixelColor(pass_wala_padosi.x, pass_wala_padosi.y);
+    // if(x == 700 && y == 700){
+    //     u_int32_t* data = (uint32_t*)texture.data;
+    //     for(int i = 0; i < texture.resolution.x; i++){
+    //         for(int j = 0; j < texture.resolution.y; j++){
+    //             std::cout << data[j * texture.resolution.x + x] << " ";
+    //         }
+    //     }
+    //     for(int i = 0; i < texture.resolution.x; i++){
+    //         for(int j = 0; j < texture.resolution.y; j++){
+    //             color = texture.loadPixelColor(i, j);
+    //             if(color.x != 0 || color.y != 0 || color.z != 0){
+    //                 std::cout << "Color: " << color.x << ", " << color.y << ", " << color.z << std::endl;
+    //             }
+    //         }
+    //     }
+    //     std::cout << "PWP: " << pass_wala_padosi.x << ", " << pass_wala_padosi.y << std::endl;
+    //     std::cout << "Resolution: " << texture.resolution.x << ", " << texture.resolution.y << std::endl;
+    //     std::cout << "Color: " << color.x << ", " << color.y << ", " << color.z << std::endl;
+    // }
 
     return color;
 }
