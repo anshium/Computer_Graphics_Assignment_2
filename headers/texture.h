@@ -29,7 +29,8 @@ struct Texture {
     void saveExr(std::string path);
     void savePng(std::string path);
 
+    Vector3f nearestNeighbourFetch(float u, float v, int x, int y);     // x, y added for debugging
     Vector2f getUVCoordinates(Vector3f intersection_point, Vector3f v1, Vector3f v2, Vector3f v3, Vector2f u1, Vector2f u2, Vector2f u3);
+    Vector3f bilinearFetch(float u, float v, int x, int y);             // x, y added for debugging
     // Vector3f getColor(int option);
 };
-Vector3f nearestNeighbourFetch(Texture texture, float u, float v, int x, int y);

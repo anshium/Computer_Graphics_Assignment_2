@@ -12,6 +12,7 @@
 #include "json/include/nlohmann/json.hpp"
 
 #define M_PI 3.14159263f
+extern int option;
 
 struct Ray {
     Vector3f o, d;

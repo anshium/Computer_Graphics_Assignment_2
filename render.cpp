@@ -30,15 +30,11 @@ long long Integrator::render()
                     si.triangleIntersected.uv1, si.triangleIntersected.uv2, si.triangleIntersected.uv3
                 );
                 if(si.intersected_on_surface->hasDiffuseTexture()){
-                
-                    white_color = nearestNeighbourFetch(si.intersected_on_surface->diffuseTexture, uv.x, uv.y, x, y);
-                    if(x == 700 && y == 700){
-                        u_int32_t* data = (uint32_t*)this->outputImage.data;
-                        for(int i = 0; i < this->outputImage.resolution.x; i++){
-                            for(int j = 0; j < this->outputImage.resolution.y; j++){
-                                std::cout << data[j * this->outputImage.resolution.x + x] << " ";
-                            }
-                        }
+                    if(option == 0){
+                        white_color = si.intersected_on_surface->diffuseTexture.nearestNeighbourFetch(uv.x, uv.y, x, y);
+                    }
+                    else if(option == 1){
+                        white_color = si.intersected_on_surface->diffuseTexture.bilinearFetch(uv.x, uv.y, x, y);
                     }
                 }
                 else{
@@ -90,12 +86,25 @@ long long Integrator::render()
     return std::chrono::duration_cast<std::chrono::microseconds>(finishTime - startTime).count();
 }
 
+int option = 0;
+
 int main(int argc, char **argv)
 {
-    if (argc != 3) {
-        std::cerr << "Usage: ./render <scene_config> <out_path>";
+    if (argc != 4) {
+        std::cerr << "Usage: ./render <scene_config> <out_path> <interpolation_variant>";
         return 1;
     }
+    if(std::stoi(argv[3]) == 0){
+        option = 0;
+    }
+    else if(std::stoi(argv[3]) == 1){
+        option = 1;
+    }
+    else{
+        std::cerr << "No such option exists" << std::endl;
+        return 1;
+    }
+
     Scene scene(argv[1]);
 
     Integrator rayTracer(scene);

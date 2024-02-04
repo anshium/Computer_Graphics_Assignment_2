@@ -215,32 +215,37 @@ double computeArea(Vector3f v1, Vector3f v2, Vector3f v3){
     Vector3f side2 = (v3 - v1);
     Vector3f side3 = (v1 - v2);
     
-    double s = (side1.Length() + side2.Length() + side3.Length()) / 2;
+    // double s = (side1.Length() + side2.Length() + side3.Length()) / 2;
 
-    double area = std::sqrt(s * (s - side1.Length()) * (s - side2.Length()) * (s - side3.Length()));
+
+
+    // double area = std::sqrt(std::abs(s * (s - side1.Length()) * (s - side2.Length()) * (s - side3.Length())));
+
+    float area = Cross(side1, side2).Length() / 2;
+
 
     return area;
 }
 
 // Get UV Coordinates at intersection point using barycentric coordinates
 Vector2f Texture::getUVCoordinates(Vector3f intersection_point, Vector3f v1, Vector3f v2, Vector3f v3, Vector2f u1, Vector2f u2, Vector2f u3){
-    double main_triangle_area = computeArea(v1, v2, v3);
+    float main_triangle_area = computeArea(v1, v2, v3);
     if(main_triangle_area <= 0){
         std::cout << "SQRT of Negative quantity" << std::endl;
     }
-    double alpha    = computeArea(intersection_point, v2, v3) / main_triangle_area;
-    double beta     = computeArea(v1, intersection_point, v3) / main_triangle_area;
-    double gamma    = computeArea(v1, v2, intersection_point) / main_triangle_area;
+    float alpha    = computeArea(intersection_point, v2, v3) / main_triangle_area;
+    float beta     = computeArea(v1, intersection_point, v3) / main_triangle_area;
+    float gamma    = computeArea(v1, v2, intersection_point) / main_triangle_area;
 
-    if(std::isnan(alpha)){
-        alpha = 0;
-    }
-    if(std::isnan(beta)){
-        beta = 0;
-    }
-    if(std::isnan(gamma)){
-        gamma = 0;
-    }
+    // if(std::isnan(alpha)){
+    //     alpha = 0;
+    // }
+    // if(std::isnan(beta)){
+    //     beta = 0;
+    // }
+    // if(std::isnan(gamma)){
+    //     gamma = 0;
+    // }
 
     // Assuming u1, u2, u3 are defined and you want to print their values as well
     #ifdef DEBUG 
@@ -267,42 +272,53 @@ Vector2f Texture::getUVCoordinates(Vector3f intersection_point, Vector3f v1, Vec
     #endif
     Vector2f uv = alpha * u1 + beta * u2 + gamma * u3;
 
-    uv.x = clamp(uv.x, 0.0f, 1.0f);
-    uv.y = clamp(uv.y, 0.0f, 1.0f);
+    // uv.x = clamp(uv.x, 0.0f, 1.0f);
+    // uv.y = clamp(uv.y, 0.0f, 1.0f);
 
     return uv;
 }
 
 // I am guessing the 
 // Fetches the color of the पास का पडोसी |
-Vector3f nearestNeighbourFetch(Texture texture, float u, float v, int x, int y){
+Vector3f Texture::nearestNeighbourFetch(float u, float v, int x, int y){
     Vector3f color = {1, 1, 1};
+
 
     // Assuming that u and v both lie from 0 to 1
     // Let's check that:
-    if(!(u >= 0 && u <= 1 && v >=0 && v <= 1)){
-        std::cout << "Error in UV Bounds" << std::endl;
-        exit(1);
-    }
+
+    // if(!(u >= 0 && u <= 1 && v >=0 && v <= 1)){
+    //     std::cout << "Error in UV Bounds" << std::endl;
+    //     exit(1);
+    // }
 
     // convert the u, v coordinates to texel coordinates
     float tx = u;
-    float ty = 1 - v;
+    float ty = v;
 
     // find corners
-    Vector2f topCornerLeft;
-    topCornerLeft.x = floor(tx * texture.resolution.x);
-    topCornerLeft.y = floor(ty * texture.resolution.y);
+    Vector2i topCornerLeft;
+    topCornerLeft.x = (int)floor(clamp((int)(tx * this->resolution.x), 0, this->resolution.x));
+    topCornerLeft.y = (int)floor(clamp((int)(ty * this->resolution.y), 0, this->resolution.y));
 
-    Vector2f topCornerRight;
+    // if(x == 900 && y == 700){
+        std::cout << "This is here" << std::endl;
+        // std::cout << u << ", ";
+        // std::cout << v << ", ";
+        std::cout << topCornerLeft.x << ", " << topCornerLeft.y;
+        // std::cout << tx * this->resolution.x << ", ";
+        // std::cout << topCornerLeft.y << std::endl;
+    // }
+
+    Vector2i topCornerRight;
     topCornerRight = {topCornerLeft.x + 1, topCornerLeft.y};
 
-    Vector2f bottomCornerLeft = {topCornerLeft.x, topCornerLeft.y + 1};
-    Vector2f bottomCornerRight = {topCornerLeft.x + 1, topCornerLeft.y + 1};
+    Vector2i bottomCornerLeft = {topCornerLeft.x, topCornerLeft.y + 1};
+    Vector2i bottomCornerRight = {topCornerLeft.x + 1, topCornerLeft.y + 1};
 
-    Vector2f middle_vector = {tx * texture.resolution.x, tx * texture.resolution.y};
+    Vector2i middle_vector = {(int)(tx * this->resolution.x), (int)(ty * this->resolution.y)};
 
-    Vector2f pass_wala_padosi;
+    Vector2i pass_wala_padosi;
 
     float min_distance = 1e30;
 
@@ -323,27 +339,83 @@ Vector3f nearestNeighbourFetch(Texture texture, float u, float v, int x, int y){
         min_distance = (middle_vector - bottomCornerRight).Length();
     }
     
+    std::vector<Vector2i> corners;
+    corners.push_back(topCornerLeft);
+    corners.push_back(topCornerRight);
+    corners.push_back(bottomCornerLeft);
+    corners.push_back(bottomCornerRight);
 
-    color = texture.loadPixelColor(pass_wala_padosi.x, pass_wala_padosi.y);
+    if(x == 1000 && y == 1000){
+        for(int i = 0; i < corners.size(); i++){
+            std::cout << corners[i].x << ", " << corners[i].y << std::endl;
+        }
+    }
+
+    color = this->loadPixelColor((int)pass_wala_padosi.x, (int)pass_wala_padosi.y);
     // if(x == 700 && y == 700){
-    //     u_int32_t* data = (uint32_t*)texture.data;
-    //     for(int i = 0; i < texture.resolution.x; i++){
-    //         for(int j = 0; j < texture.resolution.y; j++){
-    //             std::cout << data[j * texture.resolution.x + x] << " ";
+    //     u_int32_t* data = (uint32_t*)this->data;
+    //     for(int i = 0; i < this->resolution.x; i++){
+    //         for(int j = 0; j < this->resolution.y; j++){
+    //             std::cout << data[j * this->resolution.x + x] << " ";
     //         }
     //     }
-    //     for(int i = 0; i < texture.resolution.x; i++){
-    //         for(int j = 0; j < texture.resolution.y; j++){
-    //             color = texture.loadPixelColor(i, j);
+    //     for(int i = 0; i < this->resolution.x; i++){
+    //         for(int j = 0; j < this->resolution.y; j++){
+    //             color = this->loadPixelColor(i, j);
     //             if(color.x != 0 || color.y != 0 || color.z != 0){
     //                 std::cout << "Color: " << color.x << ", " << color.y << ", " << color.z << std::endl;
     //             }
     //         }
     //     }
     //     std::cout << "PWP: " << pass_wala_padosi.x << ", " << pass_wala_padosi.y << std::endl;
-    //     std::cout << "Resolution: " << texture.resolution.x << ", " << texture.resolution.y << std::endl;
+    //     std::cout << "Resolution: " << this->resolution.x << ", " << this->resolution.y << std::endl;
     //     std::cout << "Color: " << color.x << ", " << color.y << ", " << color.z << std::endl;
     // }
+
+    return color;
+}
+
+Vector3f Texture::bilinearFetch(float u, float v, int x, int y){
+    Vector3f color = {1, 1, 1};
+
+    // convert the u, v coordinates to texel coordinates
+    float tx = u;
+    float ty = v;
+
+    // find corners
+    Vector2i topCornerLeft;
+    topCornerLeft.x = (int)floor(clamp((int)(tx * this->resolution.x), 0, this->resolution.x));
+    topCornerLeft.y = (int)floor(clamp((int)(ty * this->resolution.y), 0, this->resolution.y));
+
+    Vector2i topCornerRight;
+    topCornerRight = {topCornerLeft.x + 1, topCornerLeft.y};
+
+    Vector2i bottomCornerLeft = {topCornerLeft.x, topCornerLeft.y + 1};
+    Vector2i bottomCornerRight = {topCornerLeft.x + 1, topCornerLeft.y + 1};
+
+    Vector2i middle_vector = {(int)(tx * this->resolution.x), (int)(ty * this->resolution.y)};
+
+    Vector2i pass_wala_padosi;
+
+    float min_distance = 1e30;
+
+    std::vector<Vector2i> corners;
+    corners.push_back(topCornerLeft);
+    corners.push_back(topCornerRight);
+    corners.push_back(bottomCornerLeft);
+    corners.push_back(bottomCornerRight);
+
+    Vector3f cu, cl;
+
+    cu = (topCornerRight.x - middle_vector.x) * this->loadPixelColor(topCornerLeft.x, topCornerLeft.y)
+        +
+         (middle_vector.x - topCornerLeft.x) * this->loadPixelColor(topCornerRight.x, topCornerRight.y);
+
+    cl = (bottomCornerRight.x - middle_vector.x) * this->loadPixelColor(bottomCornerLeft.x, bottomCornerLeft.y)
+        +
+         (middle_vector.x - bottomCornerLeft.x) * this->loadPixelColor(bottomCornerRight.x, bottomCornerRight.y);
+
+    color = (bottomCornerLeft.y - middle_vector.y) * cu + (middle_vector.y - topCornerLeft.y) * cl;
 
     return color;
 }

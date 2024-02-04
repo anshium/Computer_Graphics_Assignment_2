@@ -260,9 +260,9 @@ Interaction Surface::rayTriangleIntersect(Ray ray, Vector3f v1, Vector3f v2, Vec
                         si.triangleIntersected.uv1 = triangle.uv1;
                         si.triangleIntersected.uv2 = triangle.uv2;
                         si.triangleIntersected.uv3 = triangle.uv3;
-                    }
                     si.intersected_on_surface = this;
                     break;
+                }
             }
         }
         else {
