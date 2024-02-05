@@ -298,8 +298,9 @@ Vector3f Texture::nearestNeighbourFetch(float u, float v, int x, int y){
 
     // find corners
     Vector2f topCornerLeft;
-    topCornerLeft.x = clamp(floor(tx * (this->resolution.x - 1)), 0.0f, (float)this->resolution.x - 1);
-    topCornerLeft.y = clamp(floor(ty * (this->resolution.y - 1)), 0.0f, (float)this->resolution.y - 1);
+    // Made it -2 to get image similar to gt, had -1 before. IDK why this works.
+    topCornerLeft.x = clamp(floor(tx * (this->resolution.x - 1)), 0.0f, (float)(this->resolution.x - 2));
+    topCornerLeft.y = clamp(floor(ty * (this->resolution.y - 1)), 0.0f, (float)(this->resolution.y - 2));
 
     // if(x == 900 && y == 700){
         // std::cout << "This is here" << std::endl;
@@ -316,7 +317,7 @@ Vector3f Texture::nearestNeighbourFetch(float u, float v, int x, int y){
     Vector2f bottomCornerLeft = {topCornerLeft.x, topCornerLeft.y + 1};
     Vector2f bottomCornerRight = {topCornerLeft.x + 1, topCornerLeft.y + 1};
 
-    Vector2f middle_vector = {(tx * this->resolution.x), (ty * this->resolution.y)};
+    Vector2f middle_vector = {(tx * (this->resolution.x - 2)), (ty * (this->resolution.y - 2))};
 
     Vector2f pass_wala_padosi;
 
