@@ -297,28 +297,28 @@ Vector3f Texture::nearestNeighbourFetch(float u, float v, int x, int y){
     float ty = v;
 
     // find corners
-    Vector2i topCornerLeft;
-    topCornerLeft.x = (int)floor(clamp((int)(tx * this->resolution.x), 0, this->resolution.x));
-    topCornerLeft.y = (int)floor(clamp((int)(ty * this->resolution.y), 0, this->resolution.y));
+    Vector2f topCornerLeft;
+    topCornerLeft.x = clamp(floor(tx * (this->resolution.x - 1)), 0.0f, (float)this->resolution.x - 1);
+    topCornerLeft.y = clamp(floor(ty * (this->resolution.y - 1)), 0.0f, (float)this->resolution.y - 1);
 
     // if(x == 900 && y == 700){
-        std::cout << "This is here" << std::endl;
-        // std::cout << u << ", ";
-        // std::cout << v << ", ";
-        std::cout << topCornerLeft.x << ", " << topCornerLeft.y;
+        // std::cout << "This is here" << std::endl;
+        // // std::cout << u << ", ";
+        // // std::cout << v << ", ";
+        // std::cout << topCornerLeft.x << ", " << topCornerLeft.y;
         // std::cout << tx * this->resolution.x << ", ";
         // std::cout << topCornerLeft.y << std::endl;
     // }
 
-    Vector2i topCornerRight;
+    Vector2f topCornerRight;
     topCornerRight = {topCornerLeft.x + 1, topCornerLeft.y};
 
-    Vector2i bottomCornerLeft = {topCornerLeft.x, topCornerLeft.y + 1};
-    Vector2i bottomCornerRight = {topCornerLeft.x + 1, topCornerLeft.y + 1};
+    Vector2f bottomCornerLeft = {topCornerLeft.x, topCornerLeft.y + 1};
+    Vector2f bottomCornerRight = {topCornerLeft.x + 1, topCornerLeft.y + 1};
 
-    Vector2i middle_vector = {(int)(tx * this->resolution.x), (int)(ty * this->resolution.y)};
+    Vector2f middle_vector = {(tx * this->resolution.x), (ty * this->resolution.y)};
 
-    Vector2i pass_wala_padosi;
+    Vector2f pass_wala_padosi;
 
     float min_distance = 1e30;
 
@@ -339,17 +339,21 @@ Vector3f Texture::nearestNeighbourFetch(float u, float v, int x, int y){
         min_distance = (middle_vector - bottomCornerRight).Length();
     }
     
-    std::vector<Vector2i> corners;
+    std::vector<Vector2f> corners;
     corners.push_back(topCornerLeft);
     corners.push_back(topCornerRight);
     corners.push_back(bottomCornerLeft);
     corners.push_back(bottomCornerRight);
 
-    if(x == 1000 && y == 1000){
-        for(int i = 0; i < corners.size(); i++){
-            std::cout << corners[i].x << ", " << corners[i].y << std::endl;
-        }
-    }
+    // if(x == 1000 && y == 1000){
+    //     for(int i = 0; i < corners.size(); i++){
+    //         std::cout << corners[i].x << ", " << corners[i].y << std::endl;
+    //     }
+    // }    
+
+    std::vector<Vector3f> colors;
+    for(int i = 0; i < corners.size(); i++)
+    colors.push_back(this->loadPixelColor(corners[i].x, corners[i].y));
 
     color = this->loadPixelColor((int)pass_wala_padosi.x, (int)pass_wala_padosi.y);
     // if(x == 700 && y == 700){
@@ -372,6 +376,14 @@ Vector3f Texture::nearestNeighbourFetch(float u, float v, int x, int y){
     //     std::cout << "Color: " << color.x << ", " << color.y << ", " << color.z << std::endl;
     // }
 
+    if(x == 900 && y == 750){
+        std::cout << "Printing this information" << std::endl;
+        for(int i = 0; i < colors.size(); i++)
+        std::cout << colors[i].x << ", " << colors[i].y << ", " << colors[i].z << std::endl;
+
+        std::cout << color.x << ", " << color.y << ", " << color.z << std::endl;
+    }
+
     return color;
 }
 
@@ -383,29 +395,32 @@ Vector3f Texture::bilinearFetch(float u, float v, int x, int y){
     float ty = v;
 
     // find corners
-    Vector2i topCornerLeft;
-    topCornerLeft.x = (int)floor(clamp((int)(tx * this->resolution.x), 0, this->resolution.x));
-    topCornerLeft.y = (int)floor(clamp((int)(ty * this->resolution.y), 0, this->resolution.y));
+    Vector2f topCornerLeft;
+    topCornerLeft.x = clamp(floor(tx * (this->resolution.x - 1)), 0.0f, (float)this->resolution.x - 1);
+    topCornerLeft.y = clamp(floor(ty * (this->resolution.y - 1)), 0.0f, (float)this->resolution.y - 1);
 
-    Vector2i topCornerRight;
+    Vector2f topCornerRight;
     topCornerRight = {topCornerLeft.x + 1, topCornerLeft.y};
 
-    Vector2i bottomCornerLeft = {topCornerLeft.x, topCornerLeft.y + 1};
-    Vector2i bottomCornerRight = {topCornerLeft.x + 1, topCornerLeft.y + 1};
+    Vector2f bottomCornerLeft = {topCornerLeft.x, topCornerLeft.y + 1};
+    Vector2f bottomCornerRight = {topCornerLeft.x + 1, topCornerLeft.y + 1};
 
-    Vector2i middle_vector = {(int)(tx * this->resolution.x), (int)(ty * this->resolution.y)};
+    Vector2f middle_vector = Vector2f((tx * (this->resolution.x - 1)), (ty * (this->resolution.y - 1)));
 
-    Vector2i pass_wala_padosi;
 
     float min_distance = 1e30;
 
-    std::vector<Vector2i> corners;
+    std::vector<Vector2f> corners;
     corners.push_back(topCornerLeft);
     corners.push_back(topCornerRight);
     corners.push_back(bottomCornerLeft);
     corners.push_back(bottomCornerRight);
 
     Vector3f cu, cl;
+
+    std::vector<Vector3f> colors;
+    for(int i = 0; i < corners.size(); i++)
+    colors.push_back(this->loadPixelColor(corners[i].x, corners[i].y));
 
     cu = (topCornerRight.x - middle_vector.x) * this->loadPixelColor(topCornerLeft.x, topCornerLeft.y)
         +
@@ -416,6 +431,17 @@ Vector3f Texture::bilinearFetch(float u, float v, int x, int y){
          (middle_vector.x - bottomCornerLeft.x) * this->loadPixelColor(bottomCornerRight.x, bottomCornerRight.y);
 
     color = (bottomCornerLeft.y - middle_vector.y) * cu + (middle_vector.y - topCornerLeft.y) * cl;
+    if(x == 900 && y == 750){
+        std::cout << "cu, cl" << std::endl;
+        std::cout << cu.x << ", " << cu.y << ", " << cu.z << std::endl;
+        std::cout << cl.x << ", " << cl.y << ", " << cl.z << std::endl;
+
+        std::cout << "Printing this information" << std::endl;
+        for(int i = 0; i < colors.size(); i++)
+        std::cout << colors[i].x << ", " << colors[i].y << ", " << colors[i].z << std::endl;
+
+        std::cout << color.x << ", " << color.y << ", " << color.z << std::endl;
+    }
 
     return color;
 }

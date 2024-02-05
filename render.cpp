@@ -11,6 +11,7 @@ long long Integrator::render()
 {
     Vector3f white_color = {1, 1, 1};
     auto startTime = std::chrono::high_resolution_clock::now();
+    int printed = 0;
     for (int x = 0; x < this->scene.imageResolution.x; x++) {
         for (int y = 0; y < this->scene.imageResolution.y; y++) {
             Vector3f color = {0, 0, 0};
@@ -31,10 +32,19 @@ long long Integrator::render()
                 );
                 if(si.intersected_on_surface->hasDiffuseTexture()){
                     if(option == 0){
+                        if(!(printed++))
+                        std::cout << "Doing Nearest Neighbor Fetch" << std::endl;
                         white_color = si.intersected_on_surface->diffuseTexture.nearestNeighbourFetch(uv.x, uv.y, x, y);
                     }
                     else if(option == 1){
+                        if(!(printed++))
+                        std::cout << "Doing Bilinear Interpolation" << std::endl;
                         white_color = si.intersected_on_surface->diffuseTexture.bilinearFetch(uv.x, uv.y, x, y);
+                        if(x == 900 && y == 750){
+                            std::cout << "White color" << std::endl;
+
+                            std::cout << white_color.x << ", " << white_color.y << ", " << white_color.z << std::endl;
+                        }
                     }
                 }
                 else{
@@ -45,7 +55,7 @@ long long Integrator::render()
                 //     std::cout << uv.x << ", " << uv.y << std::endl;
                 //     std::cout << "x, y: " << x << ", " << y << std::endl;
                 // }
-                if(x == 545 && y == 594){
+                if(x == 900 && y == 750){
                     std::cout << "Has diffuse structure: " << si.intersected_on_surface->hasDiffuseTexture() << std::endl;
                     std::cout << uv.x << ", " << uv.y << std::endl;
                     std::cout << white_color.x << ", " << white_color.y << ", " << white_color.z << std::endl;
@@ -65,7 +75,7 @@ long long Integrator::render()
                         Vector3f displacementVector = light.locationOrDirection - si.p;
                         Vector3f direction = Normalize(displacementVector);
 
-                        Ray shadowRay = Ray(si.p + 0.01 * si.n, direction);
+                        Ray shadowRay = Ray(si.p + 0.001 * si.n, direction);
                         Interaction shadowRayInteraction = this->scene.rayIntersect(shadowRay);
                         
                         if(!shadowRayInteraction.didIntersect){
@@ -76,7 +86,7 @@ long long Integrator::render()
                         }
                     }
                 }
-                this->outputImage.writePixelColor(color, x, y);
+                // this->outputImage.writePixelColor(color, x, y);
             }
             this->outputImage.writePixelColor(color, x, y);
         }
